@@ -6,4 +6,13 @@ function toHexString(byteArray: Uint8Array) {
   }).join("");
 }
 
-console.log(toHexString(to_bson_document({ hello: new Date() })));
+console.log(
+  toHexString(
+    to_bson_document({
+      date: new Date(),
+      array: [1, 2, 3, { date: new Date() }],
+      set: new Set([{ date: new Date() }, 4, 5, 6]),
+      map: new Map([["123", "3"]])
+    })
+  )
+);

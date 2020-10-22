@@ -34,13 +34,44 @@ extern "C" {
 // TODO: prevent infinite recursion
 
 fn inspect_object(target: &JsValue) -> Result<Bson, JsValue> {
+    // TODO: check if array
     if let Some(date) = target.dyn_ref::<js_sys::Date>() {
+        // DATE
         let time: f64 = date.get_time(); // [ms]
         let secs = (time / 1e3).floor() as i64; // [s]
         let nsecs = ((time % 1e3) * 1e6).ceil() as u32; // [ns]
         let date = chrono::Utc.timestamp(secs, nsecs);
         return Ok(Bson::DateTime(date));
+    } else if let Some(iterable) = target.dyn_ref::<js_sys::Array>() {
+        // ARRAY
+        let mut array = vec![];
+        for x in iterable.iter() {
+            array.push(inspect_value(&x)?)
+        }
+        return Ok(Bson::Array(array));
+    } else if let Some(iterable) = target.dyn_ref::<js_sys::Set>() {
+        // ARRAY (set)
+        let mut array = vec![];
+        for x in iterable.keys() {
+            let x = x?;
+            array.push(inspect_value(&x)?)
+        }
+        return Ok(Bson::Array(array));
+    } else if let Some(map) = target.dyn_ref::<js_sys::Map>() {
+        // OBJECT (map)
+        let mut document = Document::default();
+        for key in map.keys() {
+            let key = key?;
+            let val = map.get(&key);
+            let key = key
+                .as_string()
+                .ok_or_else(|| JsValue::from("only object can be serialized to bson documents"))?;
+            document.insert(key, inspect_value(&val)?);
+        }
+        return Ok(Bson::Document(document));
     }
+
+    // Plain JS object
     return Ok(Bson::Document(create_document(target)?));
 }
 
@@ -56,7 +87,6 @@ fn inspect_value(target: &JsValue) -> Result<Bson, JsValue> {
     } else if target.is_null() {
         return Ok(Bson::Null);
     } else if target.is_object() {
-        // TODO: check if array
         return Ok(inspect_object(target)?);
     }
     Err("?".into())
