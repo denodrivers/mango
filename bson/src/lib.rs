@@ -20,7 +20,6 @@ pub fn to_bson_document(target: &JsValue) -> Result<Vec<u8>> {
         return Err("only object can be serialized to bson documents".into());
     }
     let document = object::create_document(&target)?;
-    log(&format!("{:?}", document));
     let mut buf: Vec<u8> = vec![];
     document
         .to_writer(&mut buf)

@@ -17,3 +17,7 @@ js-sys = "0.3"
 bson = "1.1"
 hex = "0.4"
 base64 = "0.13"
+
+[profile.release]
+lto = true
+opt-level = 3
