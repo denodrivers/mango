@@ -94,7 +94,7 @@ fn binary(target: &JsValue) -> Result<Bson> {
     }
 }
 
-pub fn inspect(target: &JsValue) -> Result<Option<Bson>> {
+pub fn transform(target: &JsValue) -> Result<Option<Bson>> {
     // extended JSON check (`$`)
     let keys = js_sys::Reflect::own_keys(target)?;
     let keys = keys.to_vec();

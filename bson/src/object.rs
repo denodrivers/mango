@@ -28,48 +28,61 @@ use crate::{extended, value, Result};
 
 // TODO: prevent infinite recursion
 
-pub fn inspect(target: &JsValue) -> Result<Bson> {
-    if let Some(date) = target.dyn_ref::<js_sys::Date>() {
-        // Date
-        let ms: f64 = date.get_time(); // [ms]
-        let secs = (ms / 1e3).floor() as i64; // [s]
-        let nsecs = ((ms % 1e3) * 1e6).ceil() as u32; // [ns]
-        let date = chrono::Utc.timestamp(secs, nsecs);
-        return Ok(Bson::DateTime(date));
-    } else if let Some(iterable) = target.dyn_ref::<js_sys::Array>() {
-        // Array
-        let mut array = vec![];
-        for x in iterable.iter() {
-            array.push(value::inspect(&x)?)
+pub fn transform(target: &JsValue, type_id: u32) -> Result<Bson> {
+    match type_id {
+        4 => {
+            // Array
+            let iterable = target.dyn_ref::<js_sys::Array>().unwrap();
+            let mut array = vec![];
+            for x in iterable.iter() {
+                array.push(value::transform(&x)?)
+            }
+            Ok(Bson::Array(array))
         }
-        return Ok(Bson::Array(array));
-    } else if let Some(iterable) = target.dyn_ref::<js_sys::Set>() {
-        // Set
-        let mut array = vec![];
-        for x in iterable.keys() {
-            let x = x?;
-            array.push(value::inspect(&x)?)
+        5 => {
+            // Date
+            let date = target.dyn_ref::<js_sys::Date>().unwrap();
+            let ms: f64 = date.get_time(); // [ms]
+            let secs = (ms / 1e3).floor() as i64; // [s]
+            let nsecs = ((ms % 1e3) * 1e6).ceil() as u32; // [ns]
+            let date = chrono::Utc.timestamp(secs, nsecs);
+            Ok(Bson::DateTime(date))
         }
-        return Ok(Bson::Array(array));
-    } else if let Some(map) = target.dyn_ref::<js_sys::Map>() {
-        // Map
-        let mut document = Document::default();
-        for key in map.keys() {
-            let key = key?;
-            let val = map.get(&key);
-            let key = key
-                .as_string()
-                .ok_or_else(|| "only object can be serialized to bson documents")?;
-            document.insert(key, value::inspect(&val)?);
+        6 => {
+            // Set
+            let iterable = target.dyn_ref::<js_sys::Set>().unwrap();
+            let mut array = vec![];
+            for x in iterable.keys() {
+                let x = x?;
+                array.push(value::transform(&x)?)
+            }
+            Ok(Bson::Array(array))
         }
-        return Ok(Bson::Document(document));
-    } else if let Some(ext) = extended::inspect(target)? {
-        // { $type: ... } objects
-        return Ok(ext);
+        7 => {
+            // Map
+            let map = target.dyn_ref::<js_sys::Map>().unwrap();
+            let mut document = Document::default();
+            for key in map.keys() {
+                let key = key?;
+                let val = map.get(&key);
+                let key = key
+                    .as_string()
+                    .ok_or_else(|| "only object can be serialized to bson documents")?;
+                document.insert(key, value::transform(&val)?);
+            }
+            Ok(Bson::Document(document))
+        }
+        8 => {
+            if let Some(ext) = extended::transform(target)? {
+                // { $type: ... } objects
+                Ok(ext)
+            } else {
+                // Plain JS object
+                Ok(Bson::Document(create_document(target)?))
+            }
+        }
+        _ => Err("type not valid in BSON spec".into()),
     }
-
-    // Plain JS object
-    return Ok(Bson::Document(create_document(target)?));
 }
 
 pub fn create_document(target: &JsValue) -> Result<Document> {
@@ -80,7 +93,7 @@ pub fn create_document(target: &JsValue) -> Result<Document> {
         let key = key
             .as_string()
             .ok_or_else(|| "failed to extract object key")?;
-        document.insert(key, value::inspect(&val)?);
+        document.insert(key, value::transform(&val)?);
     }
     Ok(document)
 }

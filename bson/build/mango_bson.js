@@ -1,4 +1,4 @@
-
+import { inspect } from './snippets/mango_bson-c61fa48deb307184/src/inspect.js';
 
 const heap = new Array(32).fill(undefined);
 
@@ -189,8 +189,8 @@ const imports = {
             getFloat64Memory0()[arg0 / 8 + 1] = isLikeNone(ret) ? 0 : ret;
             getInt32Memory0()[arg0 / 4 + 0] = !isLikeNone(ret);
         },
-        __wbindgen_is_string: function(arg0) {
-            var ret = typeof(getObject(arg0)) === 'string';
+        __wbg_inspect_c72df0ef0d0288ea: function(arg0) {
+            var ret = inspect(getObject(arg0));
             return ret;
         },
         __wbindgen_boolean_get: function(arg0) {
@@ -198,28 +198,20 @@ const imports = {
             var ret = typeof(v) === 'boolean' ? (v ? 1 : 0) : 2;
             return ret;
         },
-        __wbindgen_is_null: function(arg0) {
-            var ret = getObject(arg0) === null;
+        __wbg_isArray_8719d1387c4e1aca: function(arg0) {
+            var ret = Array.isArray(getObject(arg0));
             return ret;
         },
         __wbg_instanceof_Date_472140c286aaa82b: function(arg0) {
             var ret = getObject(arg0) instanceof Date;
             return ret;
         },
-        __wbg_isArray_8719d1387c4e1aca: function(arg0) {
-            var ret = Array.isArray(getObject(arg0));
+        __wbg_getTime_29addd71c7089c47: function(arg0) {
+            var ret = getObject(arg0).getTime();
             return ret;
         },
         __wbg_instanceof_Set_1ea76a954bbc7c45: function(arg0) {
             var ret = getObject(arg0) instanceof Set;
-            return ret;
-        },
-        __wbg_instanceof_Map_e2eca54729addc7b: function(arg0) {
-            var ret = getObject(arg0) instanceof Map;
-            return ret;
-        },
-        __wbg_getTime_29addd71c7089c47: function(arg0) {
-            var ret = getObject(arg0).getTime();
             return ret;
         },
         __wbg_keys_84471a9240844b4d: function(arg0) {
@@ -237,6 +229,10 @@ const imports = {
         __wbg_value_e60bbfb7d52af62f: function(arg0) {
             var ret = getObject(arg0).value;
             return addHeapObject(ret);
+        },
+        __wbg_instanceof_Map_e2eca54729addc7b: function(arg0) {
+            var ret = getObject(arg0) instanceof Map;
+            return ret;
         },
         __wbg_keys_7cb794f873cec791: function(arg0) {
             var ret = getObject(arg0).keys();
