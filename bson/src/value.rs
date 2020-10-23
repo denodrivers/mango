@@ -15,5 +15,5 @@ pub fn inspect(target: &JsValue) -> Result<Bson> {
     } else if target.is_object() {
         return Ok(object::inspect(target)?);
     }
-    Err("?".into())
+    Err("type not valid in BSON spec".into())
 }

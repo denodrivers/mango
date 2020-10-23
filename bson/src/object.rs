@@ -19,11 +19,11 @@ use crate::{extended, value, Result};
 // Timestamp(Timestamp),
 // MaxKey,
 // MinKey,
+// Binary(Binary),
 
 // TODO:
 // JavaScriptCode(String),
 // JavaScriptCodeWithScope(JavaScriptCodeWithScope),
-// Binary(Binary),
 // Decimal128(Decimal128), // Not working in wasm...
 
 // TODO: prevent infinite recursion

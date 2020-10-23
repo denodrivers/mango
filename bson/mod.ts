@@ -1,45 +1,110 @@
 import { to_bson_document } from "./build/mango_bson.js";
 
-export function ObjectID(oid: string) {
+export namespace types {
+  export interface ObjectID {
+    $oid: string;
+  }
+  export interface DateTime {
+    $date: {
+      $numberLong: String;
+    };
+  }
+  export interface Double {
+    $numberDouble: String;
+  }
+  export interface Int32 {
+    $numberInt: String;
+  }
+  export interface Int64 {
+    $numberLong: String;
+  }
+  export interface RegularExpression {
+    $regularExpression: {
+      pattern: string;
+      options: string;
+    };
+  }
+  export interface Timestamp {
+    $timestamp: {
+      t: number;
+      i: number;
+    };
+  }
+  export enum BinarySubtype {
+    Generic = "00",
+    Function = "01",
+    _Binary = "02",
+    _UUID = "03",
+    UUID = "04",
+    MD5 = "05",
+    Encrypted = "06",
+    UserDefined = "80",
+  }
+  export interface Binary {
+    $binary: {
+      base64: string;
+      subType: BinarySubtype;
+    };
+  }
+  export interface MaxKey {
+    $maxKey: 1;
+  }
+  export interface MinKey {
+    $minKey: 1;
+  }
+  export type BsonField =
+    | BsonObject
+    | ObjectID
+    | DateTime
+    | Double
+    | Int32
+    | Int64
+    | RegularExpression
+    | Timestamp
+    | Binary
+    | MaxKey
+    | MinKey
+    | number
+    | Date
+    | string;
+  export interface BsonObject {
+    [key: string]: BsonField;
+  }
+  export type Document = Uint8Array;
+}
+
+export function ObjectID(oid: string): types.ObjectID {
   return { $oid: oid };
 }
 
-export function DateTime(ms: number) {
+export function DateTime(ms: number): types.DateTime {
   return { $date: { $numberLong: String(ms) } };
 }
 
-export function Double(val: number) {
+export function Double(val: number): types.Double {
   return { $numberDouble: String(val) };
 }
 
-export function Int32(val: number) {
+export function Int32(val: number): types.Int32 {
   return { $numberInt: String(val) };
 }
 
-export function Int64(val: number) {
+export function Int64(val: number): types.Int64 {
   return { $numberLong: String(val) };
 }
 
-export function Regex(val: RegExp) {
+export function Regex(val: RegExp): types.RegularExpression {
   return { $regularExpression: { pattern: val.source, options: val.flags } };
 }
 
-export function Timestamp(t: number, i: number) {
+export function Timestamp(t: number, i: number): types.Timestamp {
   return { $timestamp: { t, i } };
 }
 
-enum BinaryTypes {
-  Generic = "00",
-  Function = "01",
-  _Binary = "02",
-  _UUID = "03",
-  UUID = "04",
-  MD5 = "05",
-  Encrypted = "06",
-  UserDefined = "80",
-}
-
-export function Binary(payload: Uint8Array, subType: BinaryTypes | string) {
+export function Binary(
+  payload: Uint8Array,
+  subType: types.BinarySubtype,
+): types.Binary {
   let output: string = Array.from(payload)
     .map((val): string => String.fromCharCode(val))
     .join("");
@@ -47,35 +112,14 @@ export function Binary(payload: Uint8Array, subType: BinaryTypes | string) {
   return { $binary: { base64, subType } };
 }
 
-export function MaxKey() {
+export function MaxKey(): types.MaxKey {
   return { $maxKey: 1 };
 }
 
-export function MinKey() {
+export function MinKey(): types.MinKey {
   return { $minKey: 1 };
 }
 
-// testing...
-
-function toHexString(byteArray: Uint8Array) {
-  return Array.from(byteArray, function (byte) {
-    return ("0" + (byte & 0xff).toString(16)).slice(-2);
-  }).join("");
+export function encode(object: types.BsonObject): types.Document {
+  return to_bson_document(object);
 }
-
-console.log(
-  toHexString(
-    to_bson_document({
-      id: ObjectID("5d505646cf6d4fe581014ab2"),
-      maxk: MaxKey(),
-      minK: MinKey(),
-      dt: DateTime(1565546054692),
-      d: Double(123.2),
-      i32: Int32(123),
-      i64: Int64(123),
-      re: Regex(/hello (world?)/),
-      stamp: Timestamp(123, 1),
-      a: Binary(new Uint8Array([1, 2, 3, 4]), BinaryTypes.UserDefined),
-    }),
-  ),
-);
