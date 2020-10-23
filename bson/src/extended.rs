@@ -2,7 +2,7 @@ use bson::{oid::ObjectId, Bson};
 use chrono::prelude::*;
 use wasm_bindgen::JsValue;
 
-use crate::{number, Result};
+use crate::{number, object, Result};
 
 // For reference: https://docs.mongodb.com/manual/reference/mongodb-extended-json/
 
@@ -67,6 +67,33 @@ fn regex(target: &JsValue) -> Result<Bson> {
     Ok(Bson::RegularExpression(bson::Regex { pattern, options }))
 }
 
+/// {"$binary": {"base64": <payload>, "subType": <t>}}
+/// <payload>: Base64 encoded (with padding as “=”) payload string.
+/// <t>: A one- or two-character hex string that corresponds to a BSON binary subtype.
+fn binary(target: &JsValue) -> Result<Bson> {
+    let bytes = js_sys::Reflect::get(target, &JsValue::from_str("base64"))?;
+    let subtype = js_sys::Reflect::get(target, &JsValue::from_str("subType"))?;
+    let bytes = bytes
+        .as_string()
+        .ok_or_else(|| "invalid base64 in $binary")?;
+    let subtype = subtype
+        .as_string()
+        .ok_or_else(|| "invalid subType in $binary")?;
+    let bytes = base64::decode(bytes)
+        .map_err(|err| format!("invalid base64 in $binary: {}", err.to_string()))?;
+    let subtype = hex::decode(subtype)
+        .map_err(|err| format!("invalid subType in $binary: {}", err.to_string()))?;
+
+    if subtype.len() == 1 {
+        Ok(Bson::Binary(bson::Binary {
+            bytes,
+            subtype: subtype[0].into(),
+        }))
+    } else {
+        Err("invalid subType in $binary".into())
+    }
+}
+
 pub fn inspect(target: &JsValue) -> Result<Option<Bson>> {
     // extended JSON check (`$`)
     let keys = js_sys::Reflect::own_keys(target)?;
@@ -87,6 +114,7 @@ pub fn inspect(target: &JsValue) -> Result<Option<Bson>> {
                 "$maxKey" => Some(Bson::MaxKey),
                 "$regularExpression" => Some(regex(&val)?),
                 "$timestamp" => Some(timestamp(&val)?),
+                "$binary" => Some(binary(&val)?),
                 _ => None,
             })
         }
