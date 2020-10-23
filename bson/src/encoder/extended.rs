@@ -2,7 +2,8 @@ use bson::{oid::ObjectId, Bson};
 use chrono::prelude::*;
 use wasm_bindgen::JsValue;
 
-use crate::{number, Result};
+use super::number;
+use crate::Result;
 
 // For reference: https://docs.mongodb.com/manual/reference/mongodb-extended-json/
 
