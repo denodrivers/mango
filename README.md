@@ -7,6 +7,7 @@
 [![Tags](https://img.shields.io/github/release/denodrivers/mango)](https://github.com/denodrivers/mango/releases)
 [![CI Status](https://img.shields.io/github/workflow/status/denodrivers/mango/check)](https://github.com/denodrivers/mango/actions)
 [![License](https://img.shields.io/github/license/denodrivers/mango)](https://github.com/denodrivers/mango/blob/master/LICENSE)
+[![Discord](https://img.shields.io/discord/768918486575480863?logo=discord&logoColor=white)](https://discord.gg/rYbYmt8)
 
 ---
 

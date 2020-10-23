@@ -2,7 +2,8 @@ use bson::{Bson, Document};
 use chrono::prelude::*;
 use wasm_bindgen::{JsCast, JsValue};
 
-use crate::{extended, value, Result};
+use super::{extended, value};
+use crate::Result;
 
 // DONE:
 // Double(f64),

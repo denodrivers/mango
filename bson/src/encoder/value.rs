@@ -1,7 +1,8 @@
 use bson::Bson;
 use wasm_bindgen::JsValue;
 
-use crate::{object, Result};
+use super::object;
+use crate::Result;
 
 pub fn inspect(target: &JsValue) -> Result<Bson> {
     if let Some(n) = target.as_f64() {
