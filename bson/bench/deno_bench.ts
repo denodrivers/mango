@@ -1,5 +1,5 @@
-import { Binary, encode } from "../bson/mod.ts";
-import { BinarySubtype } from "../bson/types.ts";
+import { Binary, encode } from "../mod.ts";
+import { BinarySubtype } from "../types.ts";
 import {
   bench,
   runBenchmarks,

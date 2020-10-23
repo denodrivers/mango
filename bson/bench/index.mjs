@@ -7,7 +7,7 @@ const data = bson.serialize(
     foo: "bar",
     hello: 55,
     date,
-    binary: new Buffer.alloc(128),
+    binary: Buffer.alloc(128),
   },
 );
 
@@ -20,7 +20,7 @@ for (let i = 0; i < 50000; i++) {
       foo: "bar",
       hello: 55,
       date,
-      binary: new Buffer.alloc(128),
+      binary: Buffer.alloc(128),
     },
   );
 }

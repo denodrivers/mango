@@ -1,5 +1,7 @@
-import { to_bson_document } from "./build/mango_bson.js";
+import { to_bson_document as toBsonDocument } from "./build/mango_bson.js";
 import * as types from "./types.ts";
+import { BinarySubtype } from "./types.ts";
+export { BinarySubtype, types };
 
 export function ObjectID(oid: string): types.ObjectID {
   return { $oid: oid };
@@ -49,5 +51,5 @@ export function MinKey(): types.MinKey {
 }
 
 export function encode(object: types.BsonObject): types.Document {
-  return to_bson_document(object);
+  return toBsonDocument(object);
 }
