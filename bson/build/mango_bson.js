@@ -111,71 +111,6 @@ function passStringToWasm0(arg, malloc, realloc) {
     return ptr;
 }
 
-function debugString(val) {
-    // primitive types
-    const type = typeof val;
-    if (type == 'number' || type == 'boolean' || val == null) {
-        return  `${val}`;
-    }
-    if (type == 'string') {
-        return `"${val}"`;
-    }
-    if (type == 'symbol') {
-        const description = val.description;
-        if (description == null) {
-            return 'Symbol';
-        } else {
-            return `Symbol(${description})`;
-        }
-    }
-    if (type == 'function') {
-        const name = val.name;
-        if (typeof name == 'string' && name.length > 0) {
-            return `Function(${name})`;
-        } else {
-            return 'Function';
-        }
-    }
-    // objects
-    if (Array.isArray(val)) {
-        const length = val.length;
-        let debug = '[';
-        if (length > 0) {
-            debug += debugString(val[0]);
-        }
-        for(let i = 1; i < length; i++) {
-            debug += ', ' + debugString(val[i]);
-        }
-        debug += ']';
-        return debug;
-    }
-    // Test for built-in
-    const builtInMatches = /\[object ([^\]]+)\]/.exec(toString.call(val));
-    let className;
-    if (builtInMatches.length > 1) {
-        className = builtInMatches[1];
-    } else {
-        // Failed to match the standard '[object ClassName]'
-        return toString.call(val);
-    }
-    if (className == 'Object') {
-        // we're a user defined class or Object
-        // JSON.stringify avoids problems with cycles, and is generally much
-        // easier than looping through ownProperties of `val`.
-        try {
-            return 'Object(' + JSON.stringify(val) + ')';
-        } catch (_) {
-            return 'Object';
-        }
-    }
-    // errors
-    if (val instanceof Error) {
-        return `${val.name}: ${val.message}\n${val.stack}`;
-    }
-    // TODO we could test for more things here, like `Set`s and `Map`s.
-    return className;
-}
-
 let stack_pointer = 32;
 
 function addBorrowedObject(obj) {
@@ -220,17 +155,13 @@ function handleError(f) {
 
 const imports = {
     __wbindgen_placeholder__: {
-        __wbg_log_3fa9d0b06799376f: function(arg0, arg1) {
-            console.log(getStringFromWasm0(arg0, arg1));
-        },
-        __wbindgen_is_null: function(arg0) {
-            var ret = getObject(arg0) === null;
-            return ret;
-        },
         __wbindgen_is_object: function(arg0) {
             const val = getObject(arg0);
             var ret = typeof(val) === 'object' && val !== null;
             return ret;
+        },
+        __wbg_log_3fa9d0b06799376f: function(arg0, arg1) {
+            console.log(getStringFromWasm0(arg0, arg1));
         },
         __wbindgen_string_new: function(arg0, arg1) {
             var ret = getStringFromWasm0(arg0, arg1);
@@ -238,6 +169,10 @@ const imports = {
         },
         __wbindgen_object_drop_ref: function(arg0) {
             takeObject(arg0);
+        },
+        __wbindgen_is_null: function(arg0) {
+            var ret = getObject(arg0) === null;
+            return ret;
         },
         __wbg_get_27693110cb44e852: function(arg0, arg1) {
             var ret = getObject(arg0)[arg1 >>> 0];
@@ -321,13 +256,6 @@ const imports = {
             const v = getObject(arg0);
             var ret = typeof(v) === 'boolean' ? (v ? 1 : 0) : 2;
             return ret;
-        },
-        __wbindgen_debug_string: function(arg0, arg1) {
-            var ret = debugString(getObject(arg1));
-            var ptr0 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-            var len0 = WASM_VECTOR_LEN;
-            getInt32Memory0()[arg0 / 4 + 1] = len0;
-            getInt32Memory0()[arg0 / 4 + 0] = ptr0;
         },
         __wbindgen_throw: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
