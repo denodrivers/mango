@@ -1,9 +1,55 @@
-import { to_bson_document } from "./build/mango_bson.js";
+import { to_bson_document as toBsonDocument } from "./build/mango_bson.js";
+import * as types from "./types.ts";
+import { BinarySubtype } from "./types.ts";
+export { BinarySubtype, types };
 
-function toHexString(byteArray: Uint8Array) {
-  return Array.from(byteArray, function (byte) {
-    return ("0" + (byte & 0xff).toString(16)).slice(-2);
-  }).join("");
+export function ObjectID(oid: string): types.ObjectID {
+  return { $oid: oid };
 }
 
-console.log(toHexString(to_bson_document({ hello: new Date() })));
+export function DateTime(ms: number): types.DateTime {
+  return { $date: { $numberLong: String(ms) } };
+}
+
+export function Double(val: number): types.Double {
+  return { $numberDouble: String(val) };
+}
+
+export function Int32(val: number): types.Int32 {
+  return { $numberInt: String(val) };
+}
+
+export function Int64(val: number): types.Int64 {
+  return { $numberLong: String(val) };
+}
+
+export function Regex(val: RegExp): types.RegularExpression {
+  return { $regularExpression: { pattern: val.source, options: val.flags } };
+}
+
+export function Timestamp(t: number, i: number): types.Timestamp {
+  return { $timestamp: { t, i } };
+}
+
+export function Binary(
+  payload: Uint8Array,
+  subType: types.BinarySubtype,
+): types.Binary {
+  const output: string = Array.from(payload)
+    .map((val): string => String.fromCharCode(val))
+    .join("");
+  const base64 = btoa(output);
+  return { $binary: { base64, subType } };
+}
+
+export function MaxKey(): types.MaxKey {
+  return { $maxKey: 1 };
+}
+
+export function MinKey(): types.MinKey {
+  return { $minKey: 1 };
+}
+
+export function encode(object: types.BsonObject): types.Document {
+  return toBsonDocument(object);
+}

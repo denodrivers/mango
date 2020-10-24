@@ -111,71 +111,6 @@ function passStringToWasm0(arg, malloc, realloc) {
     return ptr;
 }
 
-function debugString(val) {
-    // primitive types
-    const type = typeof val;
-    if (type == 'number' || type == 'boolean' || val == null) {
-        return  `${val}`;
-    }
-    if (type == 'string') {
-        return `"${val}"`;
-    }
-    if (type == 'symbol') {
-        const description = val.description;
-        if (description == null) {
-            return 'Symbol';
-        } else {
-            return `Symbol(${description})`;
-        }
-    }
-    if (type == 'function') {
-        const name = val.name;
-        if (typeof name == 'string' && name.length > 0) {
-            return `Function(${name})`;
-        } else {
-            return 'Function';
-        }
-    }
-    // objects
-    if (Array.isArray(val)) {
-        const length = val.length;
-        let debug = '[';
-        if (length > 0) {
-            debug += debugString(val[0]);
-        }
-        for(let i = 1; i < length; i++) {
-            debug += ', ' + debugString(val[i]);
-        }
-        debug += ']';
-        return debug;
-    }
-    // Test for built-in
-    const builtInMatches = /\[object ([^\]]+)\]/.exec(toString.call(val));
-    let className;
-    if (builtInMatches.length > 1) {
-        className = builtInMatches[1];
-    } else {
-        // Failed to match the standard '[object ClassName]'
-        return toString.call(val);
-    }
-    if (className == 'Object') {
-        // we're a user defined class or Object
-        // JSON.stringify avoids problems with cycles, and is generally much
-        // easier than looping through ownProperties of `val`.
-        try {
-            return 'Object(' + JSON.stringify(val) + ')';
-        } catch (_) {
-            return 'Object';
-        }
-    }
-    // errors
-    if (val instanceof Error) {
-        return `${val.name}: ${val.message}\n${val.stack}`;
-    }
-    // TODO we could test for more things here, like `Set`s and `Map`s.
-    return className;
-}
-
 let stack_pointer = 32;
 
 function addBorrowedObject(obj) {
@@ -220,13 +155,6 @@ function handleError(f) {
 
 const imports = {
     __wbindgen_placeholder__: {
-        __wbg_log_3fa9d0b06799376f: function(arg0, arg1) {
-            console.log(getStringFromWasm0(arg0, arg1));
-        },
-        __wbindgen_is_null: function(arg0) {
-            var ret = getObject(arg0) === null;
-            return ret;
-        },
         __wbindgen_is_object: function(arg0) {
             const val = getObject(arg0);
             var ret = typeof(val) === 'object' && val !== null;
@@ -236,33 +164,25 @@ const imports = {
             var ret = getStringFromWasm0(arg0, arg1);
             return addHeapObject(ret);
         },
-        __wbindgen_object_drop_ref: function(arg0) {
-            takeObject(arg0);
+        __wbg_ownKeys_328c4007fe203386: handleError(function(arg0) {
+            var ret = Reflect.ownKeys(getObject(arg0));
+            return addHeapObject(ret);
+        }),
+        __wbg_length_079c4e509ec6d375: function(arg0) {
+            var ret = getObject(arg0).length;
+            return ret;
         },
         __wbg_get_27693110cb44e852: function(arg0, arg1) {
             var ret = getObject(arg0)[arg1 >>> 0];
             return addHeapObject(ret);
         },
-        __wbg_length_079c4e509ec6d375: function(arg0) {
-            var ret = getObject(arg0).length;
-            return ret;
-        },
         __wbg_get_0e3f2950cdf758ae: handleError(function(arg0, arg1) {
             var ret = Reflect.get(getObject(arg0), getObject(arg1));
             return addHeapObject(ret);
         }),
-        __wbg_instanceof_Date_472140c286aaa82b: function(arg0) {
-            var ret = getObject(arg0) instanceof Date;
-            return ret;
+        __wbindgen_object_drop_ref: function(arg0) {
+            takeObject(arg0);
         },
-        __wbg_getTime_29addd71c7089c47: function(arg0) {
-            var ret = getObject(arg0).getTime();
-            return ret;
-        },
-        __wbg_ownKeys_328c4007fe203386: handleError(function(arg0) {
-            var ret = Reflect.ownKeys(getObject(arg0));
-            return addHeapObject(ret);
-        }),
         __wbindgen_number_get: function(arg0, arg1) {
             const obj = getObject(arg1);
             var ret = typeof(obj) === 'number' ? obj : undefined;
@@ -273,22 +193,63 @@ const imports = {
             var ret = typeof(getObject(arg0)) === 'string';
             return ret;
         },
-        __wbindgen_string_get: function(arg0, arg1) {
-            const obj = getObject(arg1);
-            var ret = typeof(obj) === 'string' ? obj : undefined;
-            var ptr0 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-            var len0 = WASM_VECTOR_LEN;
-            getInt32Memory0()[arg0 / 4 + 1] = len0;
-            getInt32Memory0()[arg0 / 4 + 0] = ptr0;
-        },
         __wbindgen_boolean_get: function(arg0) {
             const v = getObject(arg0);
             var ret = typeof(v) === 'boolean' ? (v ? 1 : 0) : 2;
             return ret;
         },
-        __wbindgen_debug_string: function(arg0, arg1) {
-            var ret = debugString(getObject(arg1));
-            var ptr0 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        __wbindgen_is_null: function(arg0) {
+            var ret = getObject(arg0) === null;
+            return ret;
+        },
+        __wbg_instanceof_Date_472140c286aaa82b: function(arg0) {
+            var ret = getObject(arg0) instanceof Date;
+            return ret;
+        },
+        __wbg_isArray_8719d1387c4e1aca: function(arg0) {
+            var ret = Array.isArray(getObject(arg0));
+            return ret;
+        },
+        __wbg_instanceof_Set_1ea76a954bbc7c45: function(arg0) {
+            var ret = getObject(arg0) instanceof Set;
+            return ret;
+        },
+        __wbg_instanceof_Map_e2eca54729addc7b: function(arg0) {
+            var ret = getObject(arg0) instanceof Map;
+            return ret;
+        },
+        __wbg_getTime_29addd71c7089c47: function(arg0) {
+            var ret = getObject(arg0).getTime();
+            return ret;
+        },
+        __wbg_keys_84471a9240844b4d: function(arg0) {
+            var ret = getObject(arg0).keys();
+            return addHeapObject(ret);
+        },
+        __wbg_next_2966fa909601a075: handleError(function(arg0) {
+            var ret = getObject(arg0).next();
+            return addHeapObject(ret);
+        }),
+        __wbg_done_037d0a173aef1834: function(arg0) {
+            var ret = getObject(arg0).done;
+            return ret;
+        },
+        __wbg_value_e60bbfb7d52af62f: function(arg0) {
+            var ret = getObject(arg0).value;
+            return addHeapObject(ret);
+        },
+        __wbg_keys_7cb794f873cec791: function(arg0) {
+            var ret = getObject(arg0).keys();
+            return addHeapObject(ret);
+        },
+        __wbg_get_6f7c002bf77d49ca: function(arg0, arg1) {
+            var ret = getObject(arg0).get(getObject(arg1));
+            return addHeapObject(ret);
+        },
+        __wbindgen_string_get: function(arg0, arg1) {
+            const obj = getObject(arg1);
+            var ret = typeof(obj) === 'string' ? obj : undefined;
+            var ptr0 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
             var len0 = WASM_VECTOR_LEN;
             getInt32Memory0()[arg0 / 4 + 1] = len0;
             getInt32Memory0()[arg0 / 4 + 0] = ptr0;
