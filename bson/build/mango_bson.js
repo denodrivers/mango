@@ -33,18 +33,6 @@ function addHeapObject(obj) {
     return idx;
 }
 
-function dropObject(idx) {
-    if (idx < 36) return;
-    heap[idx] = heap_next;
-    heap_next = idx;
-}
-
-function takeObject(idx) {
-    const ret = getObject(idx);
-    dropObject(idx);
-    return ret;
-}
-
 function isLikeNone(x) {
     return x === undefined || x === null;
 }
@@ -63,6 +51,18 @@ function getInt32Memory0() {
         cachegetInt32Memory0 = new Int32Array(wasm.memory.buffer);
     }
     return cachegetInt32Memory0;
+}
+
+function dropObject(idx) {
+    if (idx < 36) return;
+    heap[idx] = heap_next;
+    heap_next = idx;
+}
+
+function takeObject(idx) {
+    const ret = getObject(idx);
+    dropObject(idx);
+    return ret;
 }
 
 let WASM_VECTOR_LEN = 0;
@@ -142,6 +142,32 @@ export function to_bson_document(target) {
     }
 }
 
+function passArray8ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 1);
+    getUint8Memory0().set(arg, ptr / 1);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+/**
+* @param {Uint8Array} buf
+* @returns {string}
+*/
+export function from_bson_document(buf) {
+    try {
+        const retptr = wasm.__wbindgen_export_2.value - 16;
+        wasm.__wbindgen_export_2.value = retptr;
+        var ptr0 = passArray8ToWasm0(buf, wasm.__wbindgen_malloc);
+        var len0 = WASM_VECTOR_LEN;
+        wasm.from_bson_document(retptr, ptr0, len0);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_export_2.value += 16;
+        wasm.__wbindgen_free(r0, r1);
+    }
+}
+
 function handleError(f) {
     return function () {
         try {
@@ -163,25 +189,6 @@ const imports = {
         __wbindgen_string_new: function(arg0, arg1) {
             var ret = getStringFromWasm0(arg0, arg1);
             return addHeapObject(ret);
-        },
-        __wbg_ownKeys_328c4007fe203386: handleError(function(arg0) {
-            var ret = Reflect.ownKeys(getObject(arg0));
-            return addHeapObject(ret);
-        }),
-        __wbg_length_079c4e509ec6d375: function(arg0) {
-            var ret = getObject(arg0).length;
-            return ret;
-        },
-        __wbg_get_27693110cb44e852: function(arg0, arg1) {
-            var ret = getObject(arg0)[arg1 >>> 0];
-            return addHeapObject(ret);
-        },
-        __wbg_get_0e3f2950cdf758ae: handleError(function(arg0, arg1) {
-            var ret = Reflect.get(getObject(arg0), getObject(arg1));
-            return addHeapObject(ret);
-        }),
-        __wbindgen_object_drop_ref: function(arg0) {
-            takeObject(arg0);
         },
         __wbindgen_number_get: function(arg0, arg1) {
             const obj = getObject(arg1);
@@ -222,6 +229,17 @@ const imports = {
             var ret = getObject(arg0).getTime();
             return ret;
         },
+        __wbg_length_079c4e509ec6d375: function(arg0) {
+            var ret = getObject(arg0).length;
+            return ret;
+        },
+        __wbg_get_27693110cb44e852: function(arg0, arg1) {
+            var ret = getObject(arg0)[arg1 >>> 0];
+            return addHeapObject(ret);
+        },
+        __wbindgen_object_drop_ref: function(arg0) {
+            takeObject(arg0);
+        },
         __wbg_keys_84471a9240844b4d: function(arg0) {
             var ret = getObject(arg0).keys();
             return addHeapObject(ret);
@@ -246,6 +264,14 @@ const imports = {
             var ret = getObject(arg0).get(getObject(arg1));
             return addHeapObject(ret);
         },
+        __wbg_ownKeys_328c4007fe203386: handleError(function(arg0) {
+            var ret = Reflect.ownKeys(getObject(arg0));
+            return addHeapObject(ret);
+        }),
+        __wbg_get_0e3f2950cdf758ae: handleError(function(arg0, arg1) {
+            var ret = Reflect.get(getObject(arg0), getObject(arg1));
+            return addHeapObject(ret);
+        }),
         __wbindgen_string_get: function(arg0, arg1) {
             const obj = getObject(arg1);
             var ret = typeof(obj) === 'string' ? obj : undefined;
