@@ -63,3 +63,18 @@ export function decode(buf: types.Document): types.BsonObject {
   // TODO(lucacasonato): rehydrate this
   return JSON.parse(fromBsonDocument(buf));
 }
+
+/**
+ * This function decodes all of the documents in the Uint8Array.
+*/
+export function decodeDocuments(buf: Uint8Array): types.BsonObject[] {
+  const view = new DataView(buf.buffer);
+  let seek = 0;
+  const documents = [];
+  while (seek < buf.length) {
+    const len = view.getInt32(seek, true);
+    documents.push(decode(buf.subarray(seek, seek + len + 1)));
+    seek += len;
+  }
+  return documents;
+}
