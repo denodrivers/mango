@@ -1,5 +1,6 @@
 import { to_bson_document as toBsonDocument } from "./build/mango_bson.js";
 import * as types from "./types.ts";
+
 import { BinarySubtype } from "./types.ts";
 export { BinarySubtype, types };
 
@@ -8,7 +9,7 @@ export function ObjectID(oid: string): types.ObjectID {
 }
 
 export function DateTime(ms: number): types.DateTime {
-  return { $date: { $numberLong: String(ms) } };
+  return { $date: Int64(ms) };
 }
 
 export function Double(val: number): types.Double {
@@ -33,7 +34,7 @@ export function Timestamp(t: number, i: number): types.Timestamp {
 
 export function Binary(
   payload: Uint8Array,
-  subType: types.BinarySubtype,
+  subType: types.BinarySubtype
 ): types.Binary {
   const output: string = Array.from(payload)
     .map((val): string => String.fromCharCode(val))
@@ -51,5 +52,31 @@ export function MinKey(): types.MinKey {
 }
 
 export function encode(object: types.BsonObject): types.Document {
-  return toBsonDocument(object);
+  return toBsonDocument(JSON.stringify(object, replacer));
+}
+
+function replacer(this: types.BsonObject, key: any, value: any) {
+  const val = this[key];
+  if (val instanceof Date) {
+    return DateTime(val.getTime());
+  }
+  if (val instanceof Map) {
+    return Object.fromEntries([...val]);
+  }
+  if (val instanceof Set) {
+    return [...val];
+  }
+  return value;
+}
+
+const date = new Date();
+for (let i = 0; i < 50000; i++) {
+  const data = encode(
+    {
+      foo: "bar",
+      hello: 55,
+      date,
+      binary: Binary(new Uint8Array(128), BinarySubtype.Generic),
+    },
+  );
 }

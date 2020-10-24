@@ -2,9 +2,7 @@ export interface ObjectID {
   $oid: string;
 }
 export interface DateTime {
-  $date: {
-    $numberLong: string;
-  };
+  $date: Int64;
 }
 export interface Double {
   $numberDouble: string;
@@ -63,6 +61,8 @@ export type BsonField =
   | MinKey
   | number
   | Date
+  | Map<string, BsonField>
+  | Set<BsonField>
   | string;
 export interface BsonObject {
   [key: string]: BsonField;

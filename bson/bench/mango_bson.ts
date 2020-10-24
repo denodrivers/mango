@@ -7,7 +7,7 @@ import {
 
 bench({
   name: "encode",
-  runs: 3,
+  runs: 10,
   func(b) {
     const date = new Date();
     const data = encode(

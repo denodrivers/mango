@@ -9,14 +9,10 @@ crate-type = ["cdylib"]
 path = "src/lib.rs"
 
 [dependencies]
-chrono = "0.4"
+bson = { version = "1.1", features = ["u2i"] }
+wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
-js-sys = "0.3"
-bson = "1.1"
-hex = "0.4"
-base64 = "0.13"
 
 [profile.release]
 lto = true
