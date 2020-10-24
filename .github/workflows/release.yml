@@ -1,0 +1,17 @@
+name: release
+on:
+  release:
+    types: [published]
+
+jobs:
+
+  publish-egg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: denolib/setup-deno@master
+      - run: deno install -A -f --unstable -n eggs https://x.nest.land/eggs@0.3.1/mod.ts
+      - run: |
+          export PATH="/home/runner/.deno/bin:$PATH"
+          eggs link ${{ secrets.NEST_LAND_API_KEY }}
+          eggs publish
