@@ -134,6 +134,32 @@ export function to_bson_document(target) {
     }
 }
 
+function passArray8ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 1);
+    getUint8Memory0().set(arg, ptr / 1);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+/**
+* @param {Uint8Array} buf
+* @returns {string}
+*/
+export function from_bson_document(buf) {
+    try {
+        const retptr = wasm.__wbindgen_export_2.value - 16;
+        wasm.__wbindgen_export_2.value = retptr;
+        var ptr0 = passArray8ToWasm0(buf, wasm.__wbindgen_malloc);
+        var len0 = WASM_VECTOR_LEN;
+        wasm.from_bson_document(retptr, ptr0, len0);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_export_2.value += 16;
+        wasm.__wbindgen_free(r0, r1);
+    }
+}
+
 const imports = {
     __wbindgen_placeholder__: {
         __wbindgen_string_get: function(arg0, arg1) {

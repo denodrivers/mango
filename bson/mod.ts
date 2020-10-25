@@ -1,4 +1,7 @@
-import { to_bson_document as toBsonDocument } from "./build/mango_bson.js";
+import {
+  from_bson_document as fromBsonDocument,
+  to_bson_document as toBsonDocument,
+} from "./build/mango_bson.js";
 import * as types from "./types.ts";
 
 import { BinarySubtype } from "./types.ts";
@@ -69,14 +72,7 @@ function replacer(this: types.BsonObject, key: any, value: any) {
   return value;
 }
 
-const date = new Date();
-for (let i = 0; i < 50000; i++) {
-  const data = encode(
-    {
-      foo: "bar",
-      hello: 55,
-      date,
-      binary: Binary(new Uint8Array(128), BinarySubtype.Generic),
-    },
-  );
+export function decode(buf: types.Document): types.BsonObject {
+  // TODO(lucacasonato): rehydrate this
+  return JSON.parse(fromBsonDocument(buf));
 }
