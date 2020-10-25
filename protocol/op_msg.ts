@@ -94,11 +94,11 @@ export function parseOpMsg(buf: Uint8Array): OpMsg {
     const kind = view.getInt8(seek);
     seek++;
     if (kind === 0) {
-      const len = view.getInt32(seek);
+      const len = view.getInt32(seek, true);
       sections.push({ kind: 0, body: decode(buf.slice(seek, seek + len)) });
       seek += len;
     } else if (kind === 1) {
-      const len = view.getInt32(seek);
+      const len = view.getInt32(seek, true);
       let documentSequenceIdentifierLen = 0;
       for (const byte of buf) {
         if (byte === 0) {

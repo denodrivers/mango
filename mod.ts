@@ -5,10 +5,11 @@ console.log("Connected");
 
 const protocol = new MongoProtocol(socket);
 
-const res = await protocol.executeOpMsg(
-  [{ kind: 0, body: { count: "profiles", "$db": "juanportal" } }],
-);
-console.log(res);
+const res = await protocol.executeOpMsg([{
+  kind: 0,
+  body: { find: "profiles", "$db": "juanportal" },
+}]);
+console.log(res[0]);
 
 protocol.close();
 console.log("Closed");
