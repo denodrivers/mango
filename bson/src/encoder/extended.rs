@@ -5,8 +5,6 @@ use wasm_bindgen::JsValue;
 use super::number;
 use crate::Result;
 
-// For reference: https://docs.mongodb.com/manual/reference/mongodb-extended-json/
-
 /// `{“$oid”: ”<oid>”}`
 /// <oid>: A 24-character, big-endian hexadecimal string that represents the ObjectId bytes.
 fn oid(target: &JsValue) -> Result<Bson> {
@@ -95,6 +93,8 @@ fn binary(target: &JsValue) -> Result<Bson> {
     }
 }
 
+/// Inspect an extended JSON JsValue
+/// For reference: https://docs.mongodb.com/manual/reference/mongodb-extended-json/
 pub fn inspect(target: &JsValue) -> Result<Option<Bson>> {
     // extended JSON check (`$`)
     let keys = js_sys::Reflect::own_keys(target)?;

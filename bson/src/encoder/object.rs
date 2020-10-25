@@ -5,30 +5,7 @@ use wasm_bindgen::{JsCast, JsValue};
 use super::{extended, value};
 use crate::Result;
 
-// DONE:
-// Double(f64),
-// String(String),
-// Document(Document),
-// Boolean(bool),
-// Null,
-// DateTime(chrono::DateTime<Utc>),
-// Array(Array),
-// ObjectId(oid::ObjectId),
-// Int32(i32),
-// Int64(i64),
-// RegularExpression(Regex),
-// Timestamp(Timestamp),
-// MaxKey,
-// MinKey,
-// Binary(Binary),
-
-// TODO:
-// JavaScriptCode(String),
-// JavaScriptCodeWithScope(JavaScriptCodeWithScope),
-// Decimal128(Decimal128), // Not working in wasm...
-
-// TODO: prevent infinite recursion
-
+/// Inspect an object JsValue, taking into account default javascript values
 pub fn inspect(target: &JsValue) -> Result<Bson> {
     if let Some(date) = target.dyn_ref::<js_sys::Date>() {
         // Date
@@ -73,6 +50,7 @@ pub fn inspect(target: &JsValue) -> Result<Bson> {
     return Ok(Bson::Document(create_document(target)?));
 }
 
+// Create a BSON decument from a pure javascript object
 pub fn create_document(target: &JsValue) -> Result<Document> {
     let mut document = Document::default();
     let keys = js_sys::Reflect::own_keys(target)?;

@@ -2,12 +2,14 @@ use wasm_bindgen::JsValue;
 
 use crate::Result;
 
+/// Safely extract a JsValue into a rust String
 fn extract_string(target: &JsValue) -> Result<String> {
     target
         .as_string()
         .ok_or_else(|| "failed to extract string value".into())
 }
 
+/// Parse a string JsValue into an i64
 pub(crate) fn long(target: &JsValue) -> Result<i64> {
     let n = extract_string(target)?;
     let n = n
@@ -16,6 +18,7 @@ pub(crate) fn long(target: &JsValue) -> Result<i64> {
     Ok(n)
 }
 
+/// Parse a string JsValue into an i32
 pub(crate) fn int(target: &JsValue) -> Result<i32> {
     let n = extract_string(target)?;
     let n = n
@@ -24,6 +27,7 @@ pub(crate) fn int(target: &JsValue) -> Result<i32> {
     Ok(n)
 }
 
+/// Parse a string JsValue into an f64
 pub(crate) fn double(target: &JsValue) -> Result<f64> {
     let n = extract_string(target)?;
     match n.as_str() {

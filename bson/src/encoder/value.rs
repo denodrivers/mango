@@ -4,6 +4,7 @@ use wasm_bindgen::JsValue;
 use super::object;
 use crate::Result;
 
+/// Inspect a generic JsValue, taking into account default javascript values
 pub fn inspect(target: &JsValue) -> Result<Bson> {
     if let Some(n) = target.as_f64() {
         return Ok(Bson::Double(n));
