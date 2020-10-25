@@ -1,8 +1,10 @@
 import {
   from_bson_document as fromBsonDocument,
   to_bson_document as toBsonDocument,
-} from "./build/mango_bson.js";
+} from "./wasm/mango_bson.js";
+
 import * as types from "./types.ts";
+
 import { BinarySubtype } from "./types.ts";
 export { BinarySubtype, types };
 
