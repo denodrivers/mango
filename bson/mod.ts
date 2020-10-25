@@ -55,11 +55,26 @@ export function MinKey(): types.MinKey {
   return { $minKey: 1 };
 }
 
-export function encode(object: types.BsonObject): types.Document {
+export function encode(object: types.BsonObject): Uint8Array {
   return toBsonDocument(object);
 }
 
-export function decode(buf: types.Document): types.BsonObject {
+export function encodeDocuments(object: types.BsonObject[]): Uint8Array {
+  const buffers = object.map(toBsonDocument);
+  let total = 0;
+  for (const buffer of buffers) {
+    total += buffer.byteLength;
+  }
+  const final = new Uint8Array(total);
+  let seek = 0;
+  for (const buffer of buffers) {
+    final.set(buffer, seek);
+    seek += buffer.byteLength;
+  }
+  return final;
+}
+
+export function decode(buf: Uint8Array): types.BsonObject {
   // TODO(lucacasonato): rehydrate this
   return JSON.parse(fromBsonDocument(buf));
 }
