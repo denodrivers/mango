@@ -1,19 +1,72 @@
-<span>
-    <img align="right" src="assets/mango.png" height="150" />
-</span>
+<p align="center">
+  <img height="200" src="assets/mango.png" alt="Mango Logo">
+  <h1 align="center">Mango</h1>
+</p>
+<p align="center">A MongoDB driver for Deno.</p>
+<p align="center">
+  <a href="https://github.com/denodrivers/mango/releases">
+    <img src="https://img.shields.io/github/release/denodrivers/mango.svg?color=bright_green&label=Tags">
+  </a>
+  <a href="https://github.com/denodrivers/mango/actions">
+    <img src="https://img.shields.io/github/workflow/status/denodrivers/mango/master?label=CI Status">
+  </a>
+  <a href="https://discord.gg/r5WZ485">
+    <img src="https://img.shields.io/badge/chat-on%20discord-blue">
+  </a>
+  <a href="https://github.com/denodrivers/mango/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/denodrivers/mango">
+  </a>
+</p>
 
-# mango
-
-[![Tags](https://img.shields.io/github/release/denodrivers/mango)](https://github.com/denodrivers/mango/releases)
-[![CI Status](https://img.shields.io/github/workflow/status/denodrivers/mango/check)](https://github.com/denodrivers/mango/actions)
-[![License](https://img.shields.io/github/license/denodrivers/mango)](https://github.com/denodrivers/mango/blob/master/LICENSE)
-[![Discord](https://img.shields.io/discord/768918486575480863?logo=discord&logoColor=white)](https://discord.gg/rYbYmt8)
+---
 
 ---
 
 > ⚠️ Work in progress. Expect breaking changes.
 
 ---
+
+## Table of Contents
+- [Quick Start](#quick-start)
+- [Documentation](#documentation)
+- [Features](#features)
+- [Maintainers](#maintainers)
+- [Other](#other)
+    - [Related](#related)
+    - [Contribution](#contribution)
+    - [Licence](#licence)
+
+## Quick Start
+
+Subject to change, here as a placeholder mainly. In progress
+
+```typescript
+import { Mango } from "https://deno.land/x/mango/mod.ts"
+
+const client = new Mango({
+  // ... configs
+})
+
+const db = await client.connect()
+
+const profileCollection = db.collection("profiles")
+
+const profiles = await profileCollection.find({})
+```
+
+## Documentation
+
+In progress
+
+Link to doc.deno.land api documentation, or github pages, or add documentation here
+
+## Features
+
+In progress
+
+- [x] Connecting to the database
+- [ ] Find documents for a given collection
+- [ ] ...
 
 ## Maintainers
 
