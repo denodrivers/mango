@@ -76,7 +76,7 @@ export function encodeDocuments(object: types.BsonObject[]): Uint8Array {
 
 export function decode(buf: Uint8Array): types.BsonObject {
   // TODO(lucacasonato): rehydrate this
-  return JSON.parse(fromBsonDocument(buf));
+  return fromBsonDocument(buf);
 }
 
 /**
