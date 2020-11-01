@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  mongodb:
+    container_name: mango_mongo
+    image: mongo
+    ports:
+      - "27017:27017"
+    env_file:
+      - ./mongodb.env
+    networks:
+      - mango-network

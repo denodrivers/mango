@@ -27,31 +27,32 @@
 ---
 
 ## Table of Contents
+
 - [Quick Start](#quick-start)
 - [Documentation](#documentation)
 - [Features](#features)
 - [Maintainers](#maintainers)
 - [Other](#other)
-    - [Related](#related)
-    - [Contribution](#contribution)
-    - [Licence](#licence)
+  - [Related](#related)
+  - [Contribution](#contribution)
+  - [Licence](#licence)
 
 ## Quick Start
 
 Subject to change, here as a placeholder mainly. In progress
 
 ```typescript
-import { Mango } from "https://deno.land/x/mango/mod.ts"
+import { Mango } from "https://deno.land/x/mango/mod.ts";
 
 const client = new Mango({
   // ... configs
-})
+});
 
-const db = await client.connect()
+const db = await client.connect();
 
-const profileCollection = db.collection("profiles")
+const profileCollection = db.collection("profiles");
 
-const profiles = await profileCollection.find({})
+const profiles = await profileCollection.find({});
 ```
 
 ## Documentation
@@ -83,6 +84,21 @@ In progress
 ### Contribution
 
 Pull request, issues and feedback are very welcome. Code style is formatted with `deno fmt` and `cargo fmt` and commit messages are done following Conventional Commits spec.
+
+#### Building BSON converter
+
+The BSON converter is written in Rust, and is run in Deno using WASM. You can compile build the WASM file by running `make` in the `//bson` folder.
+
+You need to have `cargo`, `wasm-bindgen` and the Rust `wasm-unknown-unknown` target installed.
+
+#### Running driver example
+
+```shell
+$ docker-compose up -d
+$ deno run -A example.ts
+```
+
+Mongo database is seeded with a `profiles` collection, with 3 documents.
 
 ### Licence
 
