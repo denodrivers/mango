@@ -18,12 +18,12 @@ pub fn to_bson_document(target: &JsValue) -> Result<Vec<u8>> {
 }
 
 #[wasm_bindgen]
-pub fn from_bson_document(buf: Vec<u8>) -> Result<String> {
+pub fn from_bson_document(buf: Vec<u8>) -> Result<JsValue> {
     let mut x: &[u8] = &buf;
     let document = bson::Document::from_reader(&mut x).map_err(|err| {
         js_sys::Error::new(&format!("error parsing document: {}", err.to_string()))
     })?;
-    Ok(serde_json::to_string(&document).map_err(|err| {
+    Ok(JsValue::from_serde(&document).map_err(|err| {
         js_sys::Error::new(&format!(
             "error serializing document to json: {}",
             err.to_string()
