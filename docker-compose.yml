@@ -6,7 +6,3 @@ services:
     image: mongo
     ports:
       - "27017:27017"
-    env_file:
-      - ./mongodb.env
-    networks:
-      - mango-network

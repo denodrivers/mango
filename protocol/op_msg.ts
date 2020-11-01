@@ -30,6 +30,7 @@ export function serializeOpMsg(op: OpMsg): Uint8Array {
   view.setInt32(0, 0, true);
   let seek = 4;
   for (const section of sections) {
+    console.log(new Uint8Array(view.buffer));
     new Uint8Array(view.buffer).set(section, seek);
     seek += section.byteLength;
   }

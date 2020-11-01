@@ -1,3 +1,4 @@
+import { BsonObject, Document } from "../bson/types.ts";
 import {
   assert,
   assertEquals,
@@ -5,6 +6,7 @@ import {
   Deferred,
   deferred,
 } from "../deps.ts";
+import { MongoProtocolError } from "./error.ts";
 import { MessageHeader, parseHeader, serializeHeader } from "./header.ts";
 import { parseOpMsg, Section, serializeOpMsg } from "./op_msg.ts";
 
@@ -66,6 +68,7 @@ export class MongoProtocol {
     const op = serializeOpMsg({
       sections,
     });
+    console.log(op);
     await this.send({
       messageLength: 16 + op.byteLength,
       opCode: 2013,
@@ -78,6 +81,22 @@ export class MongoProtocol {
     const res = parseOpMsg(buf);
 
     return res.sections;
+  }
+
+  async executeKind0OpMsg<T extends BsonObject>(body: Document): Promise<T> {
+    const res = await this.executeOpMsg([{ kind: 0, body }]);
+    if (res.length !== 1) {
+      throw new MongoProtocolError(
+        `${res.length} sections returned, only expected 1`,
+      );
+    }
+    const section = res[0];
+    if (section.kind !== 0) {
+      throw new MongoProtocolError(
+        `section with kind ${section.kind} returned, expected 0`,
+      );
+    }
+    return section.body as T;
   }
 
   close() {

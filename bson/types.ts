@@ -51,6 +51,7 @@ export interface MinKey {
 }
 export type BsonField =
   | BsonObject
+  | BsonObject[]
   | ObjectID
   | DateTime
   | Double
@@ -63,8 +64,9 @@ export type BsonField =
   | MinKey
   | number
   | Date
-  | string;
+  | string
+  | boolean;
 export interface BsonObject {
   [key: string]: BsonField;
 }
-export type Document = Uint8Array;
+export type Document = BsonObject;
