@@ -35,8 +35,6 @@ export async function connect(
 
   const client = new MongoClient(socket);
 
-  await client.startSession();
-
   // TODO(lucacasonato): handshake the password and wire protocol version
   if (url.username || url.pathname) {
     throw new MongoDriverError(`Authentication is not yet supported.`);
@@ -49,14 +47,6 @@ class MongoClient implements MongoClientInterface {
   #protocol: MongoProtocol;
   constructor(socket: Deno.Reader & Deno.Writer & Deno.Closer) {
     this.#protocol = new MongoProtocol(socket);
-  }
-
-  async startSession(): Promise<string> {
-    const res = await this.#protocol.executeKind0OpMsg(
-      { startSession: 1, "$db": "juanportal" },
-    );
-    assertOk(res);
-    return res.id as string;
   }
 
   database(name: string): DatabaseInterface {
